@@ -1,0 +1,36 @@
+name: Build & Push Docker image
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Gitea Container Registry
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login "${{ secrets.REGISTRY || 'gitea.com' }}" -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+
+      - name: Build & push
+        env:
+          REGISTRY: ${{ secrets.REGISTRY || 'gitea.com' }}
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME || format('{0}/{1}', github.repository_owner, github.event.repository.name) }}
+        run: |
+          IMAGE="${REGISTRY}/${IMAGE_NAME}"
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+
+          docker buildx build \
+            --platform linux/amd64 \
+            -t "${IMAGE}:latest" \
+            -t "${IMAGE}:${SHORT_SHA}" \
+            --push \
+            .
