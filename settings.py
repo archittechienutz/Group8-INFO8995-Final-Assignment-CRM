@@ -22,8 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'codespace-dev.k3p.dev']
-CSRF_TRUSTED_ORIGINS=['https://codespace-dev.k3p.dev']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'potential-space-doodle-rvvp94pjv9ghpgqw-8000.app.github.dev']
+CSRF_TRUSTED_ORIGINS=['https://potential-space-doodle-rvvp94pjv9ghpgqw-8000.app.github.dev']
 # Database
 DATABASES = {
     'default': {
