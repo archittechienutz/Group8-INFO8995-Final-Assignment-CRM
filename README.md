@@ -1,45 +1,152 @@
-# django-crm-helm
-django crm from docker compose to helm chart
+# Django CRM Helm Project
 
-To run this with `docker compose`:
+## 📌 Project Overview
 
-1. Edit the file patch-settings.diff to have your hostname and url:
+This project deploys a **Django-based CRM** application using **Helm charts** on a Kubernetes cluster.
+It uses MySQL as the database and Traefik as the ingress controller. The setup is designed for local Kubernetes development environments like **k3s**, **minikube**, or **WSL2-based clusters**.
 
-```diff
- # Add your hosts to the list.
--ALLOWED_HOSTS = ['localhost', '127.0.0.1']
--
-+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'codespace-dev.k3p.dev']
-+CSRF_TRUSTED_ORIGINS=['https://codespace-dev.k3p.dev']
+---
+
+## 🚀 Features
+
+* Django CRM web application
+* MySQL backend database
+* Kubernetes manifests managed with Helm
+* Traefik ingress configuration
+* NodePort and Ingress access methods
+* Ready-to-use Docker images
+* CI/CD pipeline for build & push
+
+---
+
+## 🛠 Tech Stack
+
+* **Backend**: Django
+* **Database**: MySQL
+* **Containerization**: Docker
+* **Orchestration**: Kubernetes (Helm)
+* **Ingress**: Traefik
+* **CI/CD**: GitHub Actions / Gitea
+
+---
+
+## 📂 Repository Structure
 
 ```
+.
+├── django-crm/               # Django CRM application source code
+├── django-crm-helm/          # Helm chart for deployment
+├── Screenshots/              # Project screenshots
+├── docker-compose.yml        # Local Docker setup
+├── Dockerfile                # Application Docker build file
+├── up.yml                    # Kubernetes deployment script
+├── down.yml                  # Kubernetes teardown script
+├── patch-settings.diff       # Django settings patch
+├── schema_changes.sql        # SQL schema updates
+└── README.md                 # Project documentation
+```
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Prerequisites
+
+Make sure you have installed:
+
+* Python 3.10+
+* Docker & Docker Compose
+* Kubernetes (k3s / minikube / other)
+* Helm 3+
+* kubectl CLI
+* Git
+
+---
+
+### 2️⃣ Clone the Repository
 
 ```bash
-cp django-crm/webcrm/settings.py .
-patch <patch-settings.diff
-ansible-playbook up.yml
+git clone https://github.com/<your-username>/django-crm-helm-project.git
+cd django-crm-helm-project
 ```
 
-This will create the database. The first time you run this you will need to create a super user account.
+---
+
+### 3️⃣ Local Development (Docker Compose)
 
 ```bash
-docker compose exec crm sh -c "python manage.py setupdata"
+docker-compose up --build
 ```
 
-This will display a super user name and password. Save this somewhere as it can't be re-retrieved. The admin interface will be at `/en/456-admin/` and the regular at `/en/123`.
+Application will be available at:
+`http://localhost:8000`
 
-## Marks
+---
 
-Part 1. Create a repository on one of your gitea(s) by cloning [this repository](https://github.com/rhildred/django-crm-helm), (or atomic crm, if you have it working already). Add your teammates as collaborators (4 marks)
+### 4️⃣ Kubernetes Deployment (Helm)
 
-Part 2. Use one student's truenas for nfs storage for your database. You can use [this article](https://www.dontpanicblog.co.uk/2024/12/20/nfs-shares-in-docker/) to help (4 marks)
+```bash
+helm install crm-chart ./django-crm-helm -n crm --create-namespace
+```
 
-Part 3. Create a jenkinsfile or gitea action that updates the image from the included Dockerfile on your gitea docker image repository (see [this article](https://docs.gitea.com/usage/packages/container)) every time code is pushed (4 marks)
+Check pods:
 
-Part 4. Use a cloudflared ingress to expose your crm from your cluster to the internet (4 marks)
+```bash
+kubectl -n crm get pods
+```
 
-Part 5. Consume the docker image from step 3 in your docker-compose.yml, use Kompose to create a helm chart and modify up.yaml and down.yaml to run your image on kubernetes and expose it with a cloudflared tunnel (4 marks).
+---
 
-Total. 20
+### 5️⃣ Expose Service via NodePort
 
-I hope that this works better than what I had before. Notice that I started with the mysql setup that you are used to from PROG8850. Hopefully the docker-compose.yml file will take you from working code to working code!
+```bash
+kubectl -n crm apply -f nodeport-service.yml
+```
+
+Access via:
+`http://<NODE-IP>:30080`
+
+---
+
+### 6️⃣ Access via Traefik Ingress
+
+If Traefik is installed:
+
+```bash
+kubectl -n crm apply -f ingress.yml
+```
+
+Access via:
+`http://crm.local`
+
+---
+
+## 🖼 Screenshots
+
+### Home Page
+
+![Home Page](Screenshots/1.png)
+
+### Admin Panel
+
+![Admin Panel](Screenshots/2.png)
+
+### Database View
+
+![Database](Screenshots/3.png)
+
+---
+
+## 🔄 CI/CD Pipeline
+
+The project includes a GitHub Actions / Gitea workflow for:
+
+* Building Docker images
+* Pushing images to container registry
+* Deploying to Kubernetes via Helm
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
